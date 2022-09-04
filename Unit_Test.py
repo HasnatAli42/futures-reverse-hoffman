@@ -7,33 +7,43 @@ from datetime import datetime
 # else:
 #     print(False)
 
-list = [1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10]
+# list = [1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10]
+#
+#
+# def time_dot_round(TIME_PERIOD):
+#     candle_time = int(TIME_PERIOD.replace("m", ""))
+#     candle_time_seconds = candle_time * 60
+#     recent_check = candle_time_seconds * 0.04
+#     minute = datetime.now().minute
+#     second = datetime.now().second
+#     micro = datetime.now().microsecond
+#     time_for_next_candle = ((minute % candle_time) * 60) + second + (micro / 1000000)
+#     if recent_check > time_for_next_candle:
+#         print("Time Sleep is not Required")
+#     else:
+#         print("Time Sleep is Required")
+#     # time.sleep(candle_time_seconds - time_for_next_candle + 2)
+#     print("Time dot Sleep End", datetime.now())
+#
+# time_dot_round("5m")
+import sqlite3 as sl
+
+con = sl.connect('../orders-executed.db')
+with con:
+    hello = con.execute(f"""
+                             CREATE TABLE IF NOT EXISTS FUTURES_HOFFMAN_THREADS_EXCEPTION (
+                                 id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                                 Symbol TEXT,
+                                 Exception TEXT,
+                                 CancelOrder TEXT,
+                                 Time TEXT
+                             );
+                         """)
 
 
-def time_dot_round(TIME_PERIOD):
-    candle_time = int(TIME_PERIOD.replace("m", ""))
-    candle_time_seconds = candle_time * 60
-    recent_check = candle_time_seconds * 0.04
-    minute = datetime.now().minute
-    second = datetime.now().second
-    micro = datetime.now().microsecond
-    time_for_next_candle = ((minute % candle_time) * 60) + second + (micro / 1000000)
-    if recent_check > time_for_next_candle:
-        print("Time Sleep is not Required")
-    else:
-        print("Time Sleep is Required")
-    # time.sleep(candle_time_seconds - time_for_next_candle + 2)
-    print("Time dot Sleep End", datetime.now())
-
-time_dot_round("5m")
 
 
-
-
-
-
-
-
+print(hello)
 
 
 

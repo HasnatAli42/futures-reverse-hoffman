@@ -4,7 +4,7 @@ from Classes import Symbols, TradingBot, Indicator, Counters
 from datetime import datetime
 
 from Classes.DB import track_orders
-from Dictionary.Strings import long_placed, null_order, price_over_price, long, short
+from Dictionary.Strings import long_placed, null_order, price_over_price, long, short, short_placed
 from Functions.Order_Prices import place_order_price, calculate_stop_loss
 
 
@@ -42,7 +42,7 @@ def check_order(trade_bot_obj: TradingBot, symbol_obj: Symbols, indicator_obj: I
                                                             QNTY=symbol_obj.current_QNTY)
                     trade_bot_obj.update_data_set(side="LongOrderPlaced", SYMBOL=symbol_obj.current_symbol,
                                                   client=symbol_obj.client(), QNTY=symbol_obj.current_QNTY)
-                    track_orders(order_type=long_placed, symbol=symbol_obj.current_symbol, order1=order,
+                    track_orders(order_type=short_placed, symbol=symbol_obj.current_symbol, order1=order,
                                  order2=null_order)
                     trade_bot_obj.write_to_file(currentIndex=symbol_obj.current_index)
                     counter_obj.isProfitCheckPerformed = False
