@@ -1,21 +1,18 @@
 from datetime import datetime
 import time
-import numpy as np
 import threading
 from Classes.Counters import Counters
 from Classes.DB import DB, threads_exception_data
 from Classes.Indicator import Indicator
 from Classes.Symbols import Symbols
 from Classes.TradingBot import TradingBot
-from Config.Settings import above_or_below_wick, TIME_PERIOD, TIME_SLEEP, max_take_profit_limit
-from BinanceFuturesPy.futurespy import Client
+from Config.Settings import TIME_PERIOD, TIME_SLEEP
 from Dictionary.Strings import null_order, main_exception_1, main_exception_2
 from Functions.Check_Order import check_order
-from Functions.Mappers import assign_trade_bot_initialize_thread, assign_indicate_obj, assign_trade_bot_close_thread, \
-    assign_trade_bot_main_open
+from Functions.Mappers import assign_trade_bot_main_open
 from Functions.Randoms import allow_thread
-from Functions.Threads.Long_Thread import long_order_placed
 from Functions.Threads.Short_Thread import short_order_placed
+from Functions.Threads.Long_Thread import long_order_placed
 
 
 def main(trade_bot_obj: TradingBot, counter_obj: Counters, indicator_obj: Indicator, symb_obj: Symbols, db_obj: DB):
@@ -311,7 +308,8 @@ def main(trade_bot_obj: TradingBot, counter_obj: Counters, indicator_obj: Indica
 
             # First Check Function to Place Orders
             elif not trade_bot_obj.isOrderInProgress and not trade_bot_obj.isOrderPlaced and len(symb_obj.symbols) > 17:
-                check_order(trade_bot_obj=trade_bot_obj, symbol_obj=symb_obj, indicator_obj=indicator_obj, counter_obj=counter_obj, high=high, low=low)
+                check_order(trade_bot_obj=trade_bot_obj, symbol_obj=symb_obj, indicator_obj=indicator_obj,
+                            counter_obj=counter_obj, high=high, low=low)
                 if not trade_bot_obj.isOrderPlaced:
                     symb_obj.increment()
 

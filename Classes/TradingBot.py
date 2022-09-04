@@ -1,6 +1,6 @@
 from datetime import datetime
 from Config.Settings import Leverage, above_or_below_wick, \
-    TIME_PERIOD, LIMIT, trailing_order_check, trailing_order_increase, TIME_SLEEP, above_or_below_wick_stop_loss
+    TIME_PERIOD, LIMIT, trailing_order_check, trailing_order_increase, TIME_SLEEP, fixed_stop_loss
 import sqlite3 as sl
 import requests
 import numpy as np
@@ -167,30 +167,26 @@ class TradingBot:
         self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="SELL",
                                        price=round((short), Decimal_point_price),
                                        reduceOnly=False, timeInForce='GTC')
-        # self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="BUY",
-        #                                stopPrice=round(
-        #                                    (short + (short * above_or_below_wick * above_or_below_wick_stop_loss /100)),
-        #                                    Decimal_point_price),
-        #                                reduceOnly=True)
-
         self.isOrderPlaced = True
         self.isLongOrderPlaced = False
         self.isShortOrderPlaced = True
         return self.order1
 
     def place_in_progress_order_limits(self,  SYMBOL, client: Client, Decimal_point_price, QNTY):
+        error_in_stop_loss = False
         if self.position_quantity_any_direction(SYMBOL, client) > 0:
             self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="SELL",
-                                           price=round((self.place_order_price + (self.place_order_price * self.take_profit /100)), Decimal_point_price),
+                                           price=round((self.place_order_price + (self.place_order_price * self.take_profit/100)), Decimal_point_price),
                                            reduceOnly=False, timeInForce='GTC')
             self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="SELL",
                                            stopPrice=round(
-                                               (self.place_order_price - (self.place_order_price * self.stop_loss /
+                                               (self.place_order_price - (self.place_order_price * fixed_stop_loss /
                                                                           100)),
                                                Decimal_point_price),
                                            reduceOnly=True)
             if str(self.order2).find("code") >= 0:
                 if self.order2["code"] == -2021:
+                    error_in_stop_loss = True
                     self.order2 = client.new_order(symbol=SYMBOL, orderType="MARKET", quantity=QNTY, side="SELL")
                     self.LongHit = "LongHit2021"
 
@@ -202,14 +198,17 @@ class TradingBot:
                                            reduceOnly=False, timeInForce='GTC')
             self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="BUY",
                                            stopPrice=round(
-                                               (self.place_order_price + (self.place_order_price * self.stop_loss /
+                                               (self.place_order_price + (self.place_order_price * fixed_stop_loss /
                                                                           100)),
                                                Decimal_point_price),
                                            reduceOnly=True)
             if str(self.order2).find("code") >= 0:
                 if self.order2["code"] == -2021:
+                    error_in_stop_loss = True
                     self.order2 = client.new_order(symbol=SYMBOL, orderType="MARKET", quantity=QNTY, side="BUY")
                     self.ShortHit = "ShortHit2021"
+
+        return self.order1, self.order2, error_in_stop_loss
 
     def place_trailing_stop_loss(self,  SYMBOL, client: Client, Decimal_point_price, QNTY):
         if self.position_quantity_any_direction(SYMBOL, client) > 0:
