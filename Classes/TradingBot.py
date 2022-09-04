@@ -175,6 +175,8 @@ class TradingBot:
     def place_in_progress_order_limits(self,  SYMBOL, client: Client, Decimal_point_price, QNTY):
         error_in_stop_loss = False
         if self.position_quantity_any_direction(SYMBOL, client) > 0:
+            self.isOrderInProgress = True
+            self.isLongOrderInProgress = True
             self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="SELL",
                                            price=round((self.place_order_price + (self.place_order_price * self.take_profit/100)), Decimal_point_price),
                                            reduceOnly=False, timeInForce='GTC')
@@ -191,6 +193,8 @@ class TradingBot:
                     self.LongHit = "LongHit2021"
 
         elif self.position_quantity_any_direction(SYMBOL, client) < 0:
+            self.isOrderInProgress = True
+            self.isShortOrderInProgress = True
             self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="BUY",
                                            price=round(
                                                (self.place_order_price - (self.place_order_price * self.take_profit /
@@ -336,7 +340,7 @@ class TradingBot:
                 print(counter)
                 return counter
 
-    def executed_order_on_wick_check(self,  SYMBOL, client: Client, QNTY):
+    def executed_order_on_body_check(self,  SYMBOL, client: Client, QNTY):
         self.time_dot_round(TIME_PERIOD=TIME_PERIOD)
         time.sleep(TIME_SLEEP)
         start_price, high, low, close = self.get_data(SYMBOL)
@@ -346,12 +350,16 @@ class TradingBot:
         close = np.array(close)
         if self.isLongOrderInProgress:
             if high.take(-2) > self.place_order_price > close.take(-2):
+                pass
+            else:
                 self.cancel_executed_orders(SYMBOL, client, QNTY)
-                self.update_data_set(side="LongHitWick", SYMBOL=SYMBOL, client=client, QNTY=QNTY)
+                self.update_data_set(side="LongHitBody", SYMBOL=SYMBOL, client=client, QNTY=QNTY)
         elif self.isShortOrderInProgress:
             if low.take(-2) < self.place_order_price < close.take(-2):
+                pass
+            else:
                 self.cancel_executed_orders(SYMBOL, client, QNTY)
-                self.update_data_set(side="ShortHitWick", SYMBOL=SYMBOL, client=client, QNTY=QNTY)
+                self.update_data_set(side="ShortHitBody", SYMBOL=SYMBOL, client=client, QNTY=QNTY)
 
 
 

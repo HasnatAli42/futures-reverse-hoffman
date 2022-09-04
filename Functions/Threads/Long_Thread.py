@@ -25,6 +25,7 @@ def long_order_placed(
         is_this_thread_executed,
 ):
     try:
+        t_obj.threadCounter += 1
         print("Thread ", threading.current_thread(), "started with symbol = ", current_symbol)
         thread_trade_obj = TradingBot()
         assign_trade_bot_initialize_thread(to_be_assigned=thread_trade_obj, assigned_from=t_obj)
