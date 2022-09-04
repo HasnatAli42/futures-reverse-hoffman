@@ -1,6 +1,6 @@
 from datetime import datetime
-from Settings import Leverage, above_or_below_wick, \
-     TIME_PERIOD, LIMIT, trailing_order_check, trailing_order_increase, TIME_SLEEP
+from Config.Settings import Leverage, above_or_below_wick, \
+    TIME_PERIOD, LIMIT, trailing_order_check, trailing_order_increase, TIME_SLEEP, above_or_below_wick_stop_loss
 import sqlite3 as sl
 import requests
 import numpy as np
@@ -146,11 +146,9 @@ class TradingBot:
 
 
     def place_long_order(self, long, SYMBOL, client: Client, Decimal_point_price, QNTY):
-        client.cancel_all_open_orders(SYMBOL)
-        self.order1 = client.new_order(symbol=SYMBOL, orderType="STOP", quantity=QNTY, side="BUY",
-                                       price=round((long + ((long * above_or_below_wick) / 100)), Decimal_point_price),
-                                       stopPrice=round(long, Decimal_point_price), reduceOnly=False,
-                                       timeInForce='GTC')
+        self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="BUY",
+                                       price=round((long), Decimal_point_price),
+                                       reduceOnly=False, timeInForce='GTC')
         self.isOrderPlaced = True
         self.isLongOrderPlaced = True
         self.isShortOrderPlaced = False
@@ -166,11 +164,15 @@ class TradingBot:
 
     def place_short_order(self, short, SYMBOL, client: Client, Decimal_point_price, QNTY):
         client.cancel_all_open_orders(SYMBOL)
-        self.order1 = client.new_order(symbol=SYMBOL, orderType="STOP", quantity=QNTY, side="SELL",
-                                       price=round((short - ((short * above_or_below_wick) / 100)),
-                                                   Decimal_point_price),
-                                       stopPrice=round(short, Decimal_point_price),
+        self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="SELL",
+                                       price=round((short), Decimal_point_price),
                                        reduceOnly=False, timeInForce='GTC')
+        # self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="BUY",
+        #                                stopPrice=round(
+        #                                    (short + (short * above_or_below_wick * above_or_below_wick_stop_loss /100)),
+        #                                    Decimal_point_price),
+        #                                reduceOnly=True)
+
         self.isOrderPlaced = True
         self.isLongOrderPlaced = False
         self.isShortOrderPlaced = True
@@ -179,9 +181,7 @@ class TradingBot:
     def place_in_progress_order_limits(self,  SYMBOL, client: Client, Decimal_point_price, QNTY):
         if self.position_quantity_any_direction(SYMBOL, client) > 0:
             self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="SELL",
-                                           price=round((
-                                                   self.place_order_price + (self.place_order_price * self.take_profit /
-                                                                             100)), Decimal_point_price),
+                                           price=round((self.place_order_price + (self.place_order_price * self.take_profit /100)), Decimal_point_price),
                                            reduceOnly=False, timeInForce='GTC')
             self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="SELL",
                                            stopPrice=round(

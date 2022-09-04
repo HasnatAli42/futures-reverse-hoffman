@@ -69,6 +69,19 @@ class DB:
         con = sl.connect('../orders-executed.db')
         with con:
             con.execute(f"""
+                        CREATE TABLE IF NOT EXISTS FUTURES_{SYMBOL}_HOFFMAN_ORDERS (
+                            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                            OrderType TEXT,
+                            Symbol TEXT,
+                            Order1 TEXT,
+                            Order2 TEXT,
+                            Time TEXT
+                        );
+                    """)
+
+        con = sl.connect('../orders-executed.db')
+        with con:
+            con.execute(f"""
                                 CREATE TABLE IF NOT EXISTS FUTURES_HOFFMAN_THREADS_EXCEPTION (
                                     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                                     Symbol TEXT,
@@ -78,45 +91,16 @@ class DB:
                                 );
                             """)
 
-        con = sl.connect('../orders-executed.db')
-        with con:
-            con.execute(f"""
-                                CREATE TABLE IF NOT EXISTS HARMONIC_PARTIAL_PATTERNS (
-                                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                                    Harmonic TEXT,
-                                    Time TEXT
-                                );
-                            """)
 
-        con = sl.connect('../orders-executed.db')
-        with con:
-            con.execute(f"""
-                                CREATE TABLE IF NOT EXISTS HARMONIC_COMPLETE_PATTERNS (
-                                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                                    Harmonic TEXT,
-                                    Time TEXT
-                                );
-                            """)
-
-    def insert_harmonic_partial_pattern(self, String):
-        con = sl.connect('../orders-executed.db')
-        sql = f'INSERT INTO HARMONIC_PARTIAL_PATTERNS (Harmonic, Time) values(?,?) '
-        data = [
-            (str(String)), (str(datetime.now())),
-        ]
-        with con:
-            con.execute(sql, data)
-            con.commit()
-
-    def insert_harmonic_complete_pattern(self, String):
-        con = sl.connect('../orders-executed.db')
-        sql = f'INSERT INTO HARMONIC_COMPLETE_PATTERNS (Harmonic, Time) values(?,?) '
-        data = [
-            (str(String)), (str(datetime.now())),
-        ]
-        with con:
-            con.execute(sql, data)
-            con.commit()
+def track_orders(order_type, symbol, order1, order2):
+    con = sl.connect('../orders-executed.db')
+    sql = f'INSERT INTO FUTURES_{symbol}_HOFFMAN_ORDERS (OrderType,Symbol,Order1,Order2,Time) values(?,?,?,?,?)'
+    data = [
+        (str(order_type)), (str(symbol)), (str(order1)), (str(order2)), (str(datetime.now())),
+    ]
+    with con:
+        con.execute(sql, data)
+        con.commit()
 
 
 def threads_exception_data(symbol, exception, order):

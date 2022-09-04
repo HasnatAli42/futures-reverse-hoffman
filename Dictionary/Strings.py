@@ -1,0 +1,8 @@
+long_placed = "Long Order Placed"
+short_placed = "Short Order Placed"
+null_order = "Order not Required"
+price_over_price = "Price is over the order price"
+long = "Long"
+short = "Short"
+main_exception_1 = "Main Thread 1st Exception"
+main_exception_2 = "Main Thread 2nd Exception"

@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 
 from BinanceFuturesPy.futurespy import Client
-from Settings import TIME_PERIOD, LIMIT, Dollars, Leverage
+from Config.Settings import LIMIT, Dollars, Leverage
 
 symbols = ["BTCBUSD", "ETHBUSD", "BNBBUSD", "ADABUSD", "XRPBUSD", "DOGEBUSD", "SOLBUSD", "FTTBUSD",
            "AVAXBUSD", "NEARBUSD", "GMTBUSD", "APEBUSD", "GALBUSD", "FTMBUSD", "DODOBUSD", "ANCBUSD",
