@@ -48,11 +48,11 @@ def short_order_placed(
                 if thread_trade_obj.new_place_order_price != thread_trade_obj.place_order_price:
                     client.cancel_all_open_orders(current_symbol)
                     thread_trade_obj.place_order_price = thread_trade_obj.new_place_order_price
-                    thread_trade_obj.place_short_order(long=thread_trade_obj.place_order_price,
-                                                      SYMBOL=current_symbol,
-                                                      client=client,
-                                                      Decimal_point_price=current_decimal_point_price,
-                                                      QNTY=current_QNTY)
+                    thread_trade_obj.place_short_order(short=thread_trade_obj.place_order_price,
+                                                       SYMBOL=current_symbol,
+                                                       client=client,
+                                                       Decimal_point_price=current_decimal_point_price,
+                                                       QNTY=current_QNTY)
                     thread_trade_obj.stop_loss = ((
                                                           thread_trade_obj.place_order_price - thread_indicate_obj.fast_primary_trend_line) / thread_trade_obj.place_order_price) * 100
                     thread_trade_obj.take_profit = thread_trade_obj.stop_loss * thread_trade_obj.profit_ratio
