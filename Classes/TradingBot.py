@@ -8,6 +8,7 @@ import pandas as pd
 import time
 from BinanceFuturesPy.futurespy import Client
 
+
 class TradingBot:
 
     def __init__(self):
@@ -90,7 +91,7 @@ class TradingBot:
         self.order1 = ""
         self.order2 = ""
 
-    def update_trailing_order(self,SYMBOL,order):
+    def update_trailing_order(self, SYMBOL, order):
         con = sl.connect('../orders-executed.db')
         sql = f'INSERT INTO FUTURES_{SYMBOL}_HOFFMAN_TRAILING_ORDERS (Symbol,Order2, Time) values(?,?,?) '
         data = [
@@ -100,7 +101,6 @@ class TradingBot:
         with con:
             con.execute(sql, data)
             con.commit()
-
 
     def write_to_file(self, currentIndex):
         file = open(f'is_order_in_progress.txt', 'w')
@@ -144,10 +144,10 @@ class TradingBot:
                     self.ShortHit = "ShortHit2021"
                     self.update_trailing_order(SYMBOL=SYMBOL, order=self.order2)
 
-
     def place_long_order(self, long, SYMBOL, client: Client, Decimal_point_price, QNTY):
-        self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="BUY",
-                                       price=round((long), Decimal_point_price),
+        self.order1 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="BUY",
+                                       price=round(long, Decimal_point_price),
+                                       stopPrice=round(long, Decimal_point_price),
                                        reduceOnly=False, timeInForce='GTC')
         self.isOrderPlaced = True
         self.isLongOrderPlaced = True
@@ -164,21 +164,24 @@ class TradingBot:
 
     def place_short_order(self, short, SYMBOL, client: Client, Decimal_point_price, QNTY):
         client.cancel_all_open_orders(SYMBOL)
-        self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="SELL",
-                                       price=round((short), Decimal_point_price),
+        self.order1 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="SELL",
+                                       price=round(short, Decimal_point_price),
+                                       stopPrice=round(short, Decimal_point_price),
                                        reduceOnly=False, timeInForce='GTC')
         self.isOrderPlaced = True
         self.isLongOrderPlaced = False
         self.isShortOrderPlaced = True
         return self.order1
 
-    def place_in_progress_order_limits(self,  SYMBOL, client: Client, Decimal_point_price, QNTY):
+    def place_in_progress_order_limits(self, SYMBOL, client: Client, Decimal_point_price, QNTY):
         error_in_stop_loss = False
         if self.position_quantity_any_direction(SYMBOL, client) > 0:
             self.isOrderInProgress = True
             self.isLongOrderInProgress = True
             self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="SELL",
-                                           price=round((self.place_order_price + (self.place_order_price * self.take_profit/100)), Decimal_point_price),
+                                           price=round((self.place_order_price + (
+                                                   self.place_order_price * self.take_profit / 2 / 100)),
+                                                       Decimal_point_price),
                                            reduceOnly=False, timeInForce='GTC')
             self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="SELL",
                                            stopPrice=round(
@@ -196,9 +199,9 @@ class TradingBot:
             self.isOrderInProgress = True
             self.isShortOrderInProgress = True
             self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="BUY",
-                                           price=round(
-                                               (self.place_order_price - (self.place_order_price * self.take_profit /
-                                                                          100)), Decimal_point_price),
+                                           price=round((self.place_order_price - (
+                                                   self.place_order_price * self.take_profit / 2 / 100)),
+                                                       Decimal_point_price),
                                            reduceOnly=False, timeInForce='GTC')
             self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="BUY",
                                            stopPrice=round(
@@ -214,14 +217,18 @@ class TradingBot:
 
         return self.order1, self.order2, error_in_stop_loss
 
-    def place_trailing_stop_loss(self,  SYMBOL, client: Client, Decimal_point_price, QNTY):
+    def place_trailing_stop_loss(self, SYMBOL, client: Client, Decimal_point_price, QNTY):
         if self.position_quantity_any_direction(SYMBOL, client) > 0:
-            if self.currency_price >= (self.trailing_order_price + (self.trailing_order_price *(trailing_order_check/100))):
-                self.trailing_order_price = (self.trailing_order_price + (self.trailing_order_price * (trailing_order_increase/100)))
+            if self.currency_price >= (
+                    self.trailing_order_price + (self.trailing_order_price * (trailing_order_check / 100))):
+                self.trailing_order_price = (
+                        self.trailing_order_price + (self.trailing_order_price * (trailing_order_increase / 100)))
                 self.trailing_stop_loss_order(self.trailing_order_price, SYMBOL, client, Decimal_point_price, QNTY)
         elif self.position_quantity_any_direction(SYMBOL, client) < 0:
-            if self.currency_price <= (self.trailing_order_price - (self.trailing_order_price *(trailing_order_check/100))):
-                self.trailing_order_price = (self.trailing_order_price - (self.trailing_order_price * (trailing_order_increase/100)))
+            if self.currency_price <= (
+                    self.trailing_order_price - (self.trailing_order_price * (trailing_order_check / 100))):
+                self.trailing_order_price = (
+                        self.trailing_order_price - (self.trailing_order_price * (trailing_order_increase / 100)))
                 self.trailing_stop_loss_order(self.trailing_order_price, SYMBOL, client, Decimal_point_price, QNTY)
 
     def calculate_ema(self, prices, days, smoothing=2):
@@ -276,7 +283,6 @@ class TradingBot:
 
         return np.array(empty_list + sub_result)
 
-
     def get_price(self, SYMBOL):
         try:
             url = f"https://fapi.binance.com/fapi/v1/ticker/price?symbol={SYMBOL}"
@@ -317,7 +323,6 @@ class TradingBot:
             time.sleep(candle_time_seconds - time_for_next_candle + 2)
             print("Time dot Sleep End", datetime.now())
 
-
     def position_quantity_any_direction(self, SYMBOL, client: Client):
         posInfo = client.position_info()
         for counter in posInfo:
@@ -340,7 +345,7 @@ class TradingBot:
                 print(counter)
                 return counter
 
-    def executed_order_on_body_check(self,  SYMBOL, client: Client, QNTY):
+    def executed_order_on_body_check(self, SYMBOL, client: Client, QNTY):
         self.time_dot_round(TIME_PERIOD=TIME_PERIOD)
         time.sleep(TIME_SLEEP)
         start_price, high, low, close = self.get_data(SYMBOL)
@@ -360,10 +365,3 @@ class TradingBot:
             else:
                 self.cancel_executed_orders(SYMBOL, client, QNTY)
                 self.update_data_set(side="ShortHitBody", SYMBOL=SYMBOL, client=client, QNTY=QNTY)
-
-
-
-
-
-
-
