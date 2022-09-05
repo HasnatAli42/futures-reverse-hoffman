@@ -48,7 +48,7 @@ def short_order_placed(
                 if thread_trade_obj.new_place_order_price != thread_trade_obj.place_order_price:
                     client.cancel_all_open_orders(current_symbol)
                     thread_trade_obj.place_order_price = thread_trade_obj.new_place_order_price
-                    thread_trade_obj.place_long_order(long=thread_trade_obj.place_order_price,
+                    thread_trade_obj.place_short_order(long=thread_trade_obj.place_order_price,
                                                       SYMBOL=current_symbol,
                                                       client=client,
                                                       Decimal_point_price=current_decimal_point_price,
