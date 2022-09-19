@@ -145,9 +145,8 @@ class TradingBot:
                     self.update_trailing_order(SYMBOL=SYMBOL, order=self.order2)
 
     def place_long_order(self, long, SYMBOL, client: Client, Decimal_point_price, QNTY):
-        self.order1 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="BUY",
+        self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="BUY",
                                        price=round(long, Decimal_point_price),
-                                       stopPrice=round(long, Decimal_point_price),
                                        reduceOnly=False, timeInForce='GTC')
         self.isOrderPlaced = True
         self.isLongOrderPlaced = True
@@ -164,9 +163,9 @@ class TradingBot:
 
     def place_short_order(self, short, SYMBOL, client: Client, Decimal_point_price, QNTY):
         client.cancel_all_open_orders(SYMBOL)
-        self.order1 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="SELL",
+        self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="SELL",
+                                       # price=round(short, Decimal_point_price),
                                        price=round(short, Decimal_point_price),
-                                       stopPrice=round(short, Decimal_point_price),
                                        reduceOnly=False, timeInForce='GTC')
         self.isOrderPlaced = True
         self.isLongOrderPlaced = False
@@ -185,7 +184,7 @@ class TradingBot:
                                            reduceOnly=False, timeInForce='GTC')
             self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="SELL",
                                            stopPrice=round(
-                                               (self.place_order_price - (self.place_order_price * fixed_stop_loss /
+                                               (self.place_order_price - (self.place_order_price * self.stop_loss / 2 /
                                                                           100)),
                                                Decimal_point_price),
                                            reduceOnly=True)
@@ -205,7 +204,7 @@ class TradingBot:
                                            reduceOnly=False, timeInForce='GTC')
             self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="BUY",
                                            stopPrice=round(
-                                               (self.place_order_price + (self.place_order_price * fixed_stop_loss /
+                                               (self.place_order_price + (self.place_order_price * self.stop_loss / 2 /
                                                                           100)),
                                                Decimal_point_price),
                                            reduceOnly=True)

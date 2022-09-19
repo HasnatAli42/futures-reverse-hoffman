@@ -18,7 +18,7 @@ def check_order(trade_bot_obj: TradingBot, symbol_obj: Symbols, indicator_obj: I
     if indicator_obj.slow_speed_line > indicator_obj.fast_primary_trend_line:
         if indicator_obj.trend_line_1 >= indicator_obj.fast_primary_trend_line or indicator_obj.trend_line_2 >= indicator_obj.fast_primary_trend_line or indicator_obj.trend_line_3 >= indicator_obj.fast_primary_trend_line or indicator_obj.no_trend_zone_middle_line >= indicator_obj.fast_primary_trend_line:
             print("Long Crossed But lines in between")
-        elif indicator_obj.number_of_true_candles(open_price=open_price, high=high, low=low, close=close) < 2:
+        elif indicator_obj.number_of_true_candles(open_price=open_price, high=high, low=low, close=close) < 5:
             print("Long Crossed But True Candles are less then 2")
         else:
             print("Long Crossed looking for Hoffman Long signal wicked candle")
@@ -51,7 +51,7 @@ def check_order(trade_bot_obj: TradingBot, symbol_obj: Symbols, indicator_obj: I
     else:
         if indicator_obj.trend_line_1 <= indicator_obj.fast_primary_trend_line or indicator_obj.trend_line_2 <= indicator_obj.fast_primary_trend_line or indicator_obj.trend_line_3 <= indicator_obj.fast_primary_trend_line or indicator_obj.no_trend_zone_middle_line <= indicator_obj.fast_primary_trend_line:
             print("Short Crossed But lines in between")
-        elif indicator_obj.number_of_true_candles(open_price=open_price, high=high, low=low, close=close) < 2:
+        elif indicator_obj.number_of_true_candles(open_price=open_price, high=high, low=low, close=close) < 5:
             print("Long Crossed But True Candles are less then 2")
         else:
             print("Short Crossed looking for Hoffman Short signal wicked candle")
