@@ -179,12 +179,12 @@ class TradingBot:
             self.isLongOrderInProgress = True
             self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="SELL",
                                            price=round((self.place_order_price + (
-                                                   self.place_order_price * self.take_profit / 2 / 100)),
+                                                   self.place_order_price * self.take_profit / 100)),
                                                        Decimal_point_price),
                                            reduceOnly=False, timeInForce='GTC')
             self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="SELL",
                                            stopPrice=round(
-                                               (self.place_order_price - (self.place_order_price * self.stop_loss / 2 /
+                                               (self.place_order_price - (self.place_order_price * self.stop_loss /
                                                                           100)),
                                                Decimal_point_price),
                                            reduceOnly=True)
@@ -199,12 +199,12 @@ class TradingBot:
             self.isShortOrderInProgress = True
             self.order1 = client.new_order(symbol=SYMBOL, orderType="LIMIT", quantity=QNTY, side="BUY",
                                            price=round((self.place_order_price - (
-                                                   self.place_order_price * self.take_profit / 2 / 100)),
+                                                   self.place_order_price * self.take_profit / 100)),
                                                        Decimal_point_price),
                                            reduceOnly=False, timeInForce='GTC')
             self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="BUY",
                                            stopPrice=round(
-                                               (self.place_order_price + (self.place_order_price * self.stop_loss / 2 /
+                                               (self.place_order_price + (self.place_order_price * self.stop_loss /
                                                                           100)),
                                                Decimal_point_price),
                                            reduceOnly=True)
@@ -216,18 +216,32 @@ class TradingBot:
 
         return self.order1, self.order2, error_in_stop_loss
 
+    # def place_trailing_stop_loss(self, SYMBOL, client: Client, Decimal_point_price, QNTY):
+    #     if self.position_quantity_any_direction(SYMBOL, client) > 0:
+    #         if self.currency_price >= (
+    #                 self.trailing_order_price + (self.trailing_order_price * (trailing_order_check / 100))):
+    #             self.trailing_order_price = (
+    #                     self.trailing_order_price + (self.trailing_order_price * (trailing_order_increase / 100)))
+    #             self.trailing_stop_loss_order(self.trailing_order_price, SYMBOL, client, Decimal_point_price, QNTY)
+    #     elif self.position_quantity_any_direction(SYMBOL, client) < 0:
+    #         if self.currency_price <= (
+    #                 self.trailing_order_price - (self.trailing_order_price * (trailing_order_check / 100))):
+    #             self.trailing_order_price = (
+    #                     self.trailing_order_price - (self.trailing_order_price * (trailing_order_increase / 100)))
+    #             self.trailing_stop_loss_order(self.trailing_order_price, SYMBOL, client, Decimal_point_price, QNTY)
+
     def place_trailing_stop_loss(self, SYMBOL, client: Client, Decimal_point_price, QNTY):
         if self.position_quantity_any_direction(SYMBOL, client) > 0:
-            if self.currency_price >= (
-                    self.trailing_order_price + (self.trailing_order_price * (trailing_order_check / 100))):
-                self.trailing_order_price = (
-                        self.trailing_order_price + (self.trailing_order_price * (trailing_order_increase / 100)))
-                self.trailing_stop_loss_order(self.trailing_order_price, SYMBOL, client, Decimal_point_price, QNTY)
-        elif self.position_quantity_any_direction(SYMBOL, client) < 0:
             if self.currency_price <= (
                     self.trailing_order_price - (self.trailing_order_price * (trailing_order_check / 100))):
                 self.trailing_order_price = (
                         self.trailing_order_price - (self.trailing_order_price * (trailing_order_increase / 100)))
+                self.trailing_stop_loss_order(self.trailing_order_price, SYMBOL, client, Decimal_point_price, QNTY)
+        elif self.position_quantity_any_direction(SYMBOL, client) < 0:
+            if self.currency_price >= (
+                    self.trailing_order_price + (self.trailing_order_price * (trailing_order_check / 100))):
+                self.trailing_order_price = (
+                        self.trailing_order_price + (self.trailing_order_price * (trailing_order_increase / 100)))
                 self.trailing_stop_loss_order(self.trailing_order_price, SYMBOL, client, Decimal_point_price, QNTY)
 
     def calculate_ema(self, prices, days, smoothing=2):

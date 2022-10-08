@@ -23,7 +23,6 @@ class Counters:
         self.isLossFirst = False
         self.isProfitCheckPerformed = False
 
-
     def update_data_set_tickers(self, side, SYMBOL, LongHit, ShortHit, order_sequence, place_order_price,
                                 currency_price):
         profit = []
@@ -127,6 +126,58 @@ class Counters:
             if len(self.short_profit_counter_list) >= 2 and len(self.short_loss_counter_list) >= 2 and self.short_current_in_profit_counter > 3:
                 return True
         return False
+
+    def calculate(self, currency_price, place_order_price, side):
+        if side == "buy":
+            if currency_price < place_order_price:
+                if self.isInProfit:
+                    self.isInProfit = False
+                    self.long_profit_counter_list.append(self.long_current_in_profit_counter)
+                    if len(self.long_profit_counter_list) == 1 and len(
+                            self.long_loss_counter_list) == 0:
+                        self.isProfitFirst = True
+                    self.long_current_in_profit_counter = 0
+                self.long_current_in_loss_counter += 1
+                self.isInLoss = True
+                self.long_total_in_loss_counter += 1
+
+            else:
+                if self.isInLoss:
+                    self.isInLoss = False
+                    self.long_loss_counter_list.append(self.long_current_in_loss_counter)
+                    if len(self.long_profit_counter_list) == 0 and len(
+                            self.long_loss_counter_list) == 1:
+                        self.isLossFirst = True
+                    self.long_current_in_loss_counter = 0
+                self.long_current_in_profit_counter += 1
+                self.isInProfit = True
+                self.long_total_in_profit_counter += 1
+        elif side == "sell":
+            if currency_price > place_order_price:
+                if self.isInProfit:
+                    self.isInProfit = False
+                    self.short_profit_counter_list.append(self.short_current_in_profit_counter)
+                    if len(self.short_profit_counter_list) == 1 and len(
+                            self.short_loss_counter_list) == 0:
+                        self.isProfitFirst = True
+
+                    self.short_current_in_profit_counter = 0
+                self.short_current_in_loss_counter += 1
+                self.isInLoss = True
+                self.short_total_in_loss_counter += 1
+            else:
+                if self.isInLoss:
+                    self.isInLoss = False
+                    self.short_loss_counter_list.append(self.short_current_in_loss_counter)
+                    if len(self.short_profit_counter_list) == 0 and len(
+                            self.short_loss_counter_list) == 1:
+                        self.isLossFirst = True
+
+                    self.short_current_in_loss_counter = 0
+                self.short_current_in_profit_counter += 1
+                self.isInProfit = True
+                self.short_total_in_profit_counter += 1
+
 
 
 
