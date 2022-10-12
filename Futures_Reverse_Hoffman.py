@@ -30,11 +30,11 @@ def main(trade_bot_obj: TradingBot, counter_obj: Counters, indicator_obj: Indica
                                                  args=("fake_argument1", "fake_argument1", "fake_argument1"))
             cancel_all_orders.start()
             symb_obj.reset_increment_to_specific_symbol(symbol=trade_bot_obj.order_executed_for_symbol)
-            executed_order_on_body_check = threading.Thread(name="executed_order_on_body_check",
-                                                            target=trade_bot_obj.executed_order_on_body_check,
-                                                            args=(symb_obj.current_symbol, symb_obj.client(),
-                                                                  symb_obj.current_QNTY))
-            executed_order_on_body_check.start()
+            # executed_order_on_body_check = threading.Thread(name="executed_order_on_body_check",
+            #                                                 target=trade_bot_obj.executed_order_on_body_check,
+            #                                                 args=(symb_obj.current_symbol, symb_obj.client(),
+            #                                                       symb_obj.current_QNTY))
+            # executed_order_on_body_check.start()
             allow_thread(t_obj=trade_bot_obj)
             if trade_bot_obj.wasThreadLong:
                 trade_bot_obj.wasThreadLong = False
@@ -103,26 +103,26 @@ def main(trade_bot_obj: TradingBot, counter_obj: Counters, indicator_obj: Indica
 
                 counter_obj.long_print()
 
-                trade_bot_obj.place_trailing_stop_loss(SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
-                                                       Decimal_point_price=symb_obj.current_decimal_point_price,
-                                                       QNTY=symb_obj.current_QNTY)
+                # trade_bot_obj.place_trailing_stop_loss(SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
+                #                                        Decimal_point_price=symb_obj.current_decimal_point_price,
+                #                                        QNTY=symb_obj.current_QNTY)
 
-                if counter_obj.is_order_in_profit_again(side="buy") and not counter_obj.isProfitCheckPerformed:
-                    trade_bot_obj.trailing_stop_loss_order(stop_loss_price=trade_bot_obj.place_order_price,
-                                                           SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
-                                                           Decimal_point_price=symb_obj.current_decimal_point_price,
-                                                           QNTY=symb_obj.current_QNTY)
-                    trade_bot_obj.isBreakEvenCalled = True
-                    counter_obj.isProfitCheckPerformed = True
-
-                if trade_bot_obj.isBreakEvenCalled:
-                    if trade_bot_obj.currency_price > trade_bot_obj.place_order_price + (
-                            trade_bot_obj.place_order_price * 0.0015):
-                        trade_bot_obj.trailing_stop_loss_order(
-                            stop_loss_price=trade_bot_obj.place_order_price + (trade_bot_obj.place_order_price * 0.001),
-                            SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
-                            Decimal_point_price=symb_obj.current_decimal_point_price, QNTY=symb_obj.current_QNTY)
-                        trade_bot_obj.isBreakEvenCalled = False
+                # if counter_obj.is_order_in_profit_again(side="buy") and not counter_obj.isProfitCheckPerformed:
+                #     trade_bot_obj.trailing_stop_loss_order(stop_loss_price=trade_bot_obj.place_order_price,
+                #                                            SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
+                #                                            Decimal_point_price=symb_obj.current_decimal_point_price,
+                #                                            QNTY=symb_obj.current_QNTY)
+                #     trade_bot_obj.isBreakEvenCalled = True
+                #     counter_obj.isProfitCheckPerformed = True
+                #
+                # if trade_bot_obj.isBreakEvenCalled:
+                #     if trade_bot_obj.currency_price > trade_bot_obj.place_order_price + (
+                #             trade_bot_obj.place_order_price * 0.0015):
+                #         trade_bot_obj.trailing_stop_loss_order(
+                #             stop_loss_price=trade_bot_obj.place_order_price + (trade_bot_obj.place_order_price * 0.001),
+                #             SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
+                #             Decimal_point_price=symb_obj.current_decimal_point_price, QNTY=symb_obj.current_QNTY)
+                #         trade_bot_obj.isBreakEvenCalled = False
 
                 if trade_bot_obj.position_quantity(SYMBOL=symb_obj.current_symbol, client=symb_obj.client()) == 0:
                     symb_obj.client().cancel_all_open_orders(symb_obj.current_symbol)
@@ -189,23 +189,23 @@ def main(trade_bot_obj: TradingBot, counter_obj: Counters, indicator_obj: Indica
                                                        Decimal_point_price=symb_obj.current_decimal_point_price,
                                                        QNTY=symb_obj.current_QNTY)
 
-                if counter_obj.is_order_in_profit_again(side="sell") and not counter_obj.isProfitCheckPerformed:
-                    trade_bot_obj.trailing_stop_loss_order(stop_loss_price=trade_bot_obj.place_order_price,
-                                                           SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
-                                                           Decimal_point_price=symb_obj.current_decimal_point_price,
-                                                           QNTY=symb_obj.current_QNTY)
-                    trade_bot_obj.isBreakEvenCalled = True
-                    counter_obj.isProfitCheckPerformed = True
-
-                if trade_bot_obj.isBreakEvenCalled:
-                    if trade_bot_obj.currency_price < trade_bot_obj.place_order_price - (
-                            trade_bot_obj.place_order_price * 0.0015):
-                        trade_bot_obj.trailing_stop_loss_order(
-                            stop_loss_price=(
-                                    trade_bot_obj.place_order_price - (trade_bot_obj.place_order_price * 0.001)),
-                            SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
-                            Decimal_point_price=symb_obj.current_decimal_point_price, QNTY=symb_obj.current_QNTY)
-                        trade_bot_obj.isBreakEvenCalled = False
+                # if counter_obj.is_order_in_profit_again(side="sell") and not counter_obj.isProfitCheckPerformed:
+                #     trade_bot_obj.trailing_stop_loss_order(stop_loss_price=trade_bot_obj.place_order_price,
+                #                                            SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
+                #                                            Decimal_point_price=symb_obj.current_decimal_point_price,
+                #                                            QNTY=symb_obj.current_QNTY)
+                #     trade_bot_obj.isBreakEvenCalled = True
+                #     counter_obj.isProfitCheckPerformed = True
+                #
+                # if trade_bot_obj.isBreakEvenCalled:
+                #     if trade_bot_obj.currency_price < trade_bot_obj.place_order_price - (
+                #             trade_bot_obj.place_order_price * 0.0015):
+                #         trade_bot_obj.trailing_stop_loss_order(
+                #             stop_loss_price=(
+                #                     trade_bot_obj.place_order_price - (trade_bot_obj.place_order_price * 0.001)),
+                #             SYMBOL=symb_obj.current_symbol, client=symb_obj.client(),
+                #             Decimal_point_price=symb_obj.current_decimal_point_price, QNTY=symb_obj.current_QNTY)
+                #         trade_bot_obj.isBreakEvenCalled = False
 
                 if trade_bot_obj.position_quantity(SYMBOL=symb_obj.current_symbol, client=symb_obj.client()) == 0:
                     symb_obj.client().cancel_all_open_orders(symb_obj.current_symbol)

@@ -123,8 +123,9 @@ class TradingBot:
 
     def trailing_stop_loss_order(self, stop_loss_price, SYMBOL, client: Client, Decimal_point_price, QNTY):
         if self.position_quantity_any_direction(SYMBOL, client) > 0:
-            self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="SELL",
+            self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP", quantity=QNTY, side="SELL",
                                            stopPrice=round(stop_loss_price, Decimal_point_price),
+                                           price=round(stop_loss_price, Decimal_point_price),
                                            reduceOnly=True)
             self.update_trailing_order(SYMBOL=SYMBOL, order=self.order2)
             if str(self.order2).find("code") >= 0:
@@ -134,8 +135,9 @@ class TradingBot:
                     self.update_trailing_order(SYMBOL=SYMBOL, order=self.order2)
 
         elif self.position_quantity_any_direction(SYMBOL, client) < 0:
-            self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP_MARKET", quantity=QNTY, side="BUY",
+            self.order2 = client.new_order(symbol=SYMBOL, orderType="STOP", quantity=QNTY, side="BUY",
                                            stopPrice=round(stop_loss_price, Decimal_point_price),
+                                           price=round(stop_loss_price, Decimal_point_price),
                                            reduceOnly=True)
             self.update_trailing_order(SYMBOL=SYMBOL, order=self.order2)
             if str(self.order2).find("code") >= 0:
@@ -187,6 +189,10 @@ class TradingBot:
                                                (self.place_order_price - (self.place_order_price * self.stop_loss /
                                                                           100)),
                                                Decimal_point_price),
+                                           # price=round(
+                                           #     (self.place_order_price - (self.place_order_price * self.stop_loss /
+                                           #                                100)),
+                                           #     Decimal_point_price),
                                            reduceOnly=True)
             if str(self.order2).find("code") >= 0:
                 if self.order2["code"] == -2021:
@@ -207,6 +213,10 @@ class TradingBot:
                                                (self.place_order_price + (self.place_order_price * self.stop_loss /
                                                                           100)),
                                                Decimal_point_price),
+                                           # price=round(
+                                           #     (self.place_order_price + (self.place_order_price * self.stop_loss /
+                                           #                                100)),
+                                           #     Decimal_point_price),
                                            reduceOnly=True)
             if str(self.order2).find("code") >= 0:
                 if self.order2["code"] == -2021:

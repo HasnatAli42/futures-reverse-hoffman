@@ -50,18 +50,34 @@ class Indicator:
         index_counter = -1
         if self.slow_speed_line > self.fast_primary_trend_line:
             slow_speed_line = 1
+            trend_line_1 = -1
+            trend_line_2 = -1
+            trend_line_3 = -1
+            no_trend_zone_middle_line = -1
             fast_primary_trend_line = 0
-            while slow_speed_line > fast_primary_trend_line:
+            while slow_speed_line > fast_primary_trend_line > trend_line_1 and fast_primary_trend_line > trend_line_2 and fast_primary_trend_line > trend_line_3 and fast_primary_trend_line > no_trend_zone_middle_line:
                 index_counter += -1
                 slow_speed_line = talib.SMA(close, 5)[index_counter]
                 fast_primary_trend_line = talib.EMA(close, 18)[index_counter]
+                trend_line_1 = talib.SMA(close, 50)[index_counter]
+                trend_line_2 = talib.SMA(close, 89)[index_counter]
+                trend_line_3 = talib.EMA(close, 144)[index_counter]
+                no_trend_zone_middle_line = talib.EMA(close, 35)[index_counter]
         else:
             slow_speed_line = 0
+            trend_line_1 = 2
+            trend_line_2 = 2
+            trend_line_3 = 2
+            no_trend_zone_middle_line = 2
             fast_primary_trend_line = 1
-            while slow_speed_line < fast_primary_trend_line:
+            while slow_speed_line < fast_primary_trend_line < trend_line_1 and fast_primary_trend_line < trend_line_2 and fast_primary_trend_line < trend_line_3 and fast_primary_trend_line < no_trend_zone_middle_line:
                 index_counter += -1
                 slow_speed_line = talib.SMA(close, 5)[index_counter]
                 fast_primary_trend_line = talib.EMA(close, 18)[index_counter]
+                trend_line_1 = talib.SMA(close, 50)[index_counter]
+                trend_line_2 = talib.SMA(close, 89)[index_counter]
+                trend_line_3 = talib.EMA(close, 144)[index_counter]
+                no_trend_zone_middle_line = talib.EMA(close, 35)[index_counter]
         return index_counter + 1
 
     def number_of_true_candles(self, open_price, high, low, close):
